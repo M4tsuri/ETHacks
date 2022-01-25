@@ -12,7 +12,7 @@ import {
   Signer,
   utils,
 } from "ethers";
-import { FunctionFragment, Result } from "@ethersproject/abi";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
@@ -26,8 +26,25 @@ export interface AttackInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "attack", data: BytesLike): Result;
 
-  events: {};
+  events: {
+    "Received(address,uint256)": EventFragment;
+    "SelfDestruct()": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "Received"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SelfDestruct"): EventFragment;
 }
+
+export type ReceivedEvent = TypedEvent<
+  [string, BigNumber],
+  { arg0: string; arg1: BigNumber }
+>;
+
+export type ReceivedEventFilter = TypedEventFilter<ReceivedEvent>;
+
+export type SelfDestructEvent = TypedEvent<[], {}>;
+
+export type SelfDestructEventFilter = TypedEventFilter<SelfDestructEvent>;
 
 export interface Attack extends BaseContract {
   contractName: "Attack";
@@ -70,7 +87,13 @@ export interface Attack extends BaseContract {
     attack(overrides?: CallOverrides): Promise<void>;
   };
 
-  filters: {};
+  filters: {
+    "Received(address,uint256)"(arg0?: null, arg1?: null): ReceivedEventFilter;
+    Received(arg0?: null, arg1?: null): ReceivedEventFilter;
+
+    "SelfDestruct()"(): SelfDestructEventFilter;
+    SelfDestruct(): SelfDestructEventFilter;
+  };
 
   estimateGas: {
     attack(

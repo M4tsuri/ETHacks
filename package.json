@@ -3,5 +3,8 @@
     "workspaces": [
         "selfdestruct/contracts",
         "selfdestruct/play"
-    ]
+    ],
+    "devDependencies": {
+        "@types/fs-extra": "^9.0.13"
+    }
 }
