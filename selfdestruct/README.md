@@ -1,28 +1,8 @@
-## 3. Coin Flip
+## selfdestruct带来的安全问题
 
-本题难度显著上升，因为以往的off-chain交易方式不能再应用到这一题上。
+selfdestruct的参数是一个payable address，其作用是将当前合约摧毁，并将余额打到参数指定的地址中。当一个合约调用selfdestruct时，无论指定地址是否是常规账户，**无论合约账户是否实现了receive/fallback**，都会将余额转过去。因此在编写合约时依赖`address(this).balance`可能会带来逻辑漏洞。
 
-使用下面代码尝试调用合约中的flip，我们并没能得到函数的返回值：
+我们复现了 https://solidity-by-example.org/hacks/self-destruct/ 中提出的漏洞并编写代码成功利用，结果如下：
 
-```ts
-async function main() {
-  let alice = new Wallet(testPrivKey);
-  alice = alice.connect(provider);
-  console.log(utils.formatEther(await alice.getBalance()));
-  const coin = CoinFlip__factory.connect(contractAddress, provider).connect(alice);
-
-  coin.flip(true)
-    .then(res => console.log(res))
-}
-```
-
-为了弄清楚发生了什么，我们首先需要学习一些前置知识。
-
-### On-Chain与Off-Chain
-
-
-
-程序的脆弱点在于将当前区块序号的hash作为随机数，但实际上这并不是一个可信的随机数。因为攻击者在一定情况下可以控制区块号的hash，例如发出大量高gas的请求使交易被优先接收并放在可预测的区块中。
-
-
+![](../screenshots/selfdesturct.png)
 

