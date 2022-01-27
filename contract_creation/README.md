@@ -1,8 +1,6 @@
-## 一些小实验
+## 创建合约的一些细节
 
 实验中参照的黄皮书版本为 `BERLIN VERSION fabef25 – 2021-12-02`
-
-### 通过raw transaction创建合约
 
 当transaction的to域为空时，该交易是一个contract creation交易，因此我们可以使用下面这种方式创建合约(该函数的实现参见[这里](https://github.com/M4tsuri/ETHacks/blob/ad2d297117c247979d822c820c3154cb7a942fd9/experiments/play/src/create_fail.ts#L19)：
 
@@ -35,7 +33,7 @@ await sendRawTransaction({
 2. 交易sender的nonce加一
 3. 其余与交易发生前的世界状态保持一致
 
-#### 合约创建代码执行失败
+### 合约创建代码执行失败
 
 init代码执行失败意味着代码的非自然结束，这种情况统称为OOG（Out-of-gas），但实际上原因可能多种多样，例如init代码中存在invalid opcode，如[这个例子](https://github.com/M4tsuri/ETHacks/blob/ad2d297117c247979d822c820c3154cb7a942fd9/experiments/play/src/create_fail.ts#L57)。无论是怎样的异常情况，只要出现异常，就会导致世界状态回退到checkpoint，这直接进一步导致：
 
@@ -56,7 +54,7 @@ init代码执行失败意味着代码的非自然结束，这种情况统称为O
 
 可以看到，一切正如我们假设的那样。
 
-#### 合约地址已存在
+### 合约地址已存在
 
 这是一个很奇怪的边界情况，因为合约地址已存在的情况实在是太难想到了。但是黄皮书仍然对此做了详细的形式化定义。对于下面这两种情况，我们视为异常，处理措施与合约创建代码执行失败时相同（对应黄皮书式105）
 
